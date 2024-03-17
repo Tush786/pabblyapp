@@ -18,11 +18,13 @@ import {
   } from "@chakra-ui/react";
   import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
   import { MdConnectWithoutContact } from "react-icons/md";
-  import { Link as RouterLink } from "react-router-dom";
+  import { Link as RouterLink, useNavigate } from "react-router-dom";
   
   const Links = ["channels", "about", "posts"];
   
   const NavLink = ({ children }) => (
+
+     
     <Link
       fontSize="lg"
       as={RouterLink}
@@ -41,10 +43,12 @@ import {
       {children.toUpperCase()}
     </Link>
   );
+
+
   
   export default function Navbar() {
     const { isOpen, onOpen, onClose } = useDisclosure();
-  
+       const Navigate=useNavigate()
     return (
       <>
         <Box
@@ -94,21 +98,17 @@ import {
                 </MenuButton>
                 <MenuList>
                   <MenuItem
+                      onClick={() => {
+            Navigate("/login");
+          }}
                     _hover={{
                       bg: useColorModeValue("#D3D3D3", "rgba(0, 0, 0, 0.20)")
                     }}
                     _focus={{
                       bg: useColorModeValue("#D3D3D3", "rgba(0, 0, 0, 0.20)")
                     }}
-                    /*
-                    _active={{
-                      bg: useColorModeValue("#D3D3D3", "rgba(0, 0, 0, 0.20)")
-                    }}
-                    _expanded={{
-                      bg: useColorModeValue("#D3D3D3", "rgba(0, 0, 0, 0.20)")
-                    }}*/
                   >
-                    Link 1
+                   Login/Signup
                   </MenuItem>
                   <MenuItem
                     _hover={{
