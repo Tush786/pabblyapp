@@ -2,50 +2,63 @@ import axios from "axios";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import { useDispatch, useSelector } from "react-redux";
 import { auth } from "../Oauth/Firebase";
+import { LoginUser, addUser } from "../redux/action";
+import { useToast } from "@chakra-ui/react";
 
-const obj={
-    email:"",
-      password:""
-  }
 function Login() {
   const Navigate = useNavigate();
-  const [form,setForm]=useState(obj)
-  const provider= new GoogleAuthProvider()
+  const provider = new GoogleAuthProvider();
 
-  function HandleChange(e){
-    setForm({...form,[e.target.name]:e.target.value});
-   }
+  const dispatch = useDispatch();
+  const status = useSelector((state) => state.user.status);
+  const toast = useToast();
 
-  async function HandleSubmit(e){
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+    gauth: false,
+  });
 
-    console.log(obj)
+  const handleChange = (e) => {
     e.preventDefault();
-    try {
-      let resp=await axios.post(`http://localhost:9911/user/login`,{...form});
-      console.log(resp)
-      // if(resp.data.operator==='admin'){
-      //   navigator('/home')
-      // }
-      // const obj={
-      //   isauth.token:resp.token,
-      //   isautho.isauth:true,
-      // }
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
 
-      // setIsautho(obj)
-    } catch (error) {
-      console.log(error)
+  const handleSubmit = async () => {
+    const { email, password } = user;
+
+    if (!email.includes("@") || !email.includes(".com")) {
+      toast({
+        title: "Enter valid email",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     }
-      
-        console.log("Form Submitted");
-   }
 
-   const signInWithGoogle = () => {
+    if (password === "" || password.length < 10) {
+      toast({
+        title: "Enter valid password",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+
+      return;
+    }
+
+    dispatch(LoginUser(user));
+  };
+  const signInWithGoogle = () => {
     signInWithPopup(auth, provider).then((result) => {
       // navigate("/home");
-      console.log(result)
+      console.log(result);
     });
-  }
+  };
 
   return (
     <section className="h-[100%] flex flex-col  md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
@@ -56,46 +69,38 @@ function Login() {
         />
       </div>
       <div className="md:w-1/3 max-w-sm">
-        <div className="text-center md:text-left">
+        <div className="text-center md:text-left flex justify-start gap-6 ">
           <label className="mr-1">Sign in with</label>
-          <FcGoogle
-             onClick={signInWithGoogle}
-         className="w-24 h-[35px] -ml-12 cursor-pointer"
-      />
-          <button
-            type="button"
-            className="inlne-block mx-1 h-9 w-9 rounded-full bg-blue-600 hover:bg-blue-700 uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca]"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="mx-auto h-3.5 w-3.5"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-            </svg>
-          </button>
+          <div>
+            <FcGoogle
+              onClick={signInWithGoogle}
+              className="w-24 h-[35px] -ml-12 cursor-pointer"
+            />
+          </div>
         </div>
         <div className="my-5 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300">
           <p className="mx-4 mb-0 text-center font-semibold text-slate-500">
             Or
           </p>
         </div>
-        <form onSubmit={HandleSubmit}>
-        <input
-          className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded"
-          type="text"
-          placeholder="Email Address"
-          onChange={(e)=>HandleChange(e)}
-        />
-        <input
-          className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded mt-4"
-          type="password"
-          placeholder="Password"
-          onChange={(e)=>HandleChange(e)}
-        />
-         <input className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded mt-4 bg-[#8898ee] text-white"  type="submit"/>
-         </form>
+        <form onSubmit={handleSubmit}>
+          <input
+            className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded"
+            type="text"
+            placeholder="Email Address"
+            onChange={(e) => handleChange(e)}
+          />
+          <input
+            className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded mt-4"
+            type="password"
+            placeholder="Password"
+            onChange={(e) => handleChange(e)}
+          />
+          <input
+            className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded mt-4 bg-[#8898ee] text-white"
+            type="submit"
+          />
+        </form>
         <div className="mt-4 flex justify-between font-semibold text-sm">
           <label className="flex text-slate-500 hover:text-slate-600 cursor-pointer">
             <input className="mr-1" type="checkbox" />
@@ -108,7 +113,7 @@ function Login() {
             Forgot Password?
           </a>
         </div>
-      
+
         <div
           onClick={() => {
             Navigate("/signup");
