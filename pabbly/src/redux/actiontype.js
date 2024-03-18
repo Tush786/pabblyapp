@@ -7,5 +7,5 @@ export const RESET_USER = "RESET_USER";
 export const LOADING = "LOADING";
 export const NOT_LOADING = "NOT_LOADING";
 export const ADD_TASK="ADD_TASK"
-
+export const GET_TASK="GET_TASK"
 

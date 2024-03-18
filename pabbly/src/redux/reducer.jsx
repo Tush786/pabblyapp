@@ -1,13 +1,14 @@
-import { EDIT_USER, GET_USER, LOADING, LOGIN_USER, LOGOUT_USER, NOT_LOADING, POST_USER, RESET_USER } from './actiontype'
+import { EDIT_USER, GET_TASK, GET_USER, LOADING, LOGIN_USER, LOGOUT_USER, NOT_LOADING, POST_USER, RESET_USER } from './actiontype'
 
 const initialState = {
     user : {},
     loggedIn: false,
     status:"",
     token:"",
-    
+    Taskdata:[],
     isLoading: false
 }
+
 
 export const Reducer = (state=initialState,{type,payload})=>{
     switch(type){
@@ -19,6 +20,7 @@ export const Reducer = (state=initialState,{type,payload})=>{
         case RESET_USER :return{...state,status:payload}
         case LOADING: return {...state,isLoading:true}
         case NOT_LOADING: return {...state,isLoading:false}
+        case GET_TASK:return {...state,Taskdata:payload}
         default : return state
     }
 }

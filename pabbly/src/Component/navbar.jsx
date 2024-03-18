@@ -26,8 +26,8 @@ import { LOADING, LOGOUT_USER, NOT_LOADING } from "../redux/actiontype";
 // import { Link } from "react-router-dom";
 
 const Links = [
-  { path: "/createtask", title: "Create-Task", type: true },
-  { path: "/taskcards", title: "Show-Task", type: true },
+  // { path: "/createtask", title: "Create-Task", type: true },
+  // { path: "/taskcards", title: "Show-Task", type: true },
 ];
 
 // const NavLink = ({ children }) => (
@@ -77,9 +77,9 @@ export default function Navbar() {
   }
 
   function handleRoute(){
-    if(!token){
-      Navigate("/login");
-    }
+    // if(!token){
+    //   Navigate("/login");
+    // }
   }
 
   function HandleHomeRoute(){

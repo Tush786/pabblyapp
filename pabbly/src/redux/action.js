@@ -2,6 +2,7 @@ import axios from "axios"
 import {
   ADD_TASK,
   EDIT_USER,
+  GET_TASK,
   GET_USER,
   LOGIN_USER,
   POST_USER,
@@ -133,6 +134,19 @@ export const Addtask = (task) => async (dispatch) => {
     dispatch({
       type: ADD_TASK,
       payload: resp.data
+    })
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export const getTaskData = () => async (dispatch) => {
+  try {
+    const gettask = await axios.get(`http://localhost:9911/task/getTask`)
+    console.log(gettask.data.tasks)
+    dispatch({
+      type: GET_TASK,
+      payload: gettask.data.tasks
     })
   } catch (err) {
     console.log(err)

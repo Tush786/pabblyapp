@@ -19,15 +19,12 @@ function Task() {
   });
 
   const toast = useToast();
-  const dispatch=useDispatch();
-
+  const dispatch = useDispatch();
 
   function handleChange(e) {
     const { name, value } = e.target;
     const updatedValue =
-      name === "taskdate"
-        ? new Date(value).toISOString().split("T")[0]
-        : value;
+      name === "taskdate" ? new Date(value).toISOString().split("T")[0] : value;
     setTaskform((prevState) => ({
       ...prevState,
       [name]: updatedValue,
@@ -48,7 +45,7 @@ function Task() {
       return;
     }
 
-    if (!taskdate ) {
+    if (!taskdate) {
       toast({
         title: "All field are required",
         status: "error",
@@ -72,7 +69,7 @@ function Task() {
   }
 
   return (
-    <div className="w-[40%] m-auto">
+    <div className="w-[500px] border-dashed">
       <form onSubmit={handleSubmit}>
         <FormControl>
           <FormLabel>Title</FormLabel>
@@ -102,9 +99,7 @@ function Task() {
           />
         </FormControl>
 
-        <Button mt={4} colorScheme="teal" type="submit">
-          Submit
-        </Button>
+        <Input mt={4} colorScheme="teal" type="submit" />
       </form>
     </div>
   );
