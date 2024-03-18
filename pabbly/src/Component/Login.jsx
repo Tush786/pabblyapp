@@ -1,6 +1,6 @@
 import axios from "axios";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +14,8 @@ function Login() {
 
   const dispatch = useDispatch();
   const status = useSelector((state) => state.user.status);
+  const token = useSelector((state) => state.user.token);
+  console.log(token);
   const toast = useToast();
 
   const [user, setUser] = useState({
@@ -27,38 +29,54 @@ function Login() {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     const { email, password } = user;
 
-    if (!email.includes("@") || !email.includes(".com")) {
-      toast({
-        title: "Enter valid email",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
+    // if (!email.includes("@") || !email.includes(".com")) {
+    //   toast({
+    //     title: "Enter valid email",
+    //     status: "error",
+    //     duration: 3000,
+    //     isClosable: true,
+    //   });
+    //   return;
+    // }
 
-    if (password === "" || password.length < 10) {
-      toast({
-        title: "Enter valid password",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+    // if (password === "" || password.length < 10) {
+    //   toast({
+    //     title: "Enter valid password",
+    //     status: "error",
+    //     duration: 3000,
+    //     isClosable: true,
+    //   });
 
-      return;
-    }
+    //   return;
+    // }
 
     dispatch(LoginUser(user));
   };
-  const signInWithGoogle = () => {
+   const [userj,setUserj]=useState();
+  const LogiInWithGoogle = () => {
+   
     signInWithPopup(auth, provider).then((result) => {
       // navigate("/home");
       console.log(result);
+
+       const userobj={
+          username:result.user.displayName,
+          email:result.user.email,
+          gauth:true
+        }
+        setUserj(userobj)
+        dispatch(LoginUser(userobj))
     });
+    
   };
+
+  useEffect(()=>{
+
+  },[])
 
   return (
     <section className="h-[100%] flex flex-col  md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
@@ -73,7 +91,7 @@ function Login() {
           <label className="mr-1">Sign in with</label>
           <div>
             <FcGoogle
-              onClick={signInWithGoogle}
+              onClick={LogiInWithGoogle}
               className="w-24 h-[35px] -ml-12 cursor-pointer"
             />
           </div>
@@ -86,7 +104,8 @@ function Login() {
         <form onSubmit={handleSubmit}>
           <input
             className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded"
-            type="text"
+            type="email"
+            name="email"
             placeholder="Email Address"
             onChange={(e) => handleChange(e)}
           />
@@ -94,6 +113,7 @@ function Login() {
             className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded mt-4"
             type="password"
             placeholder="Password"
+            name="password"
             onChange={(e) => handleChange(e)}
           />
           <input

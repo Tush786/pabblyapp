@@ -1,54 +1,120 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../Oauth/Firebase';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import axios from 'axios';
 import { FcGoogle } from 'react-icons/fc';
+import { useDispatch, useSelector } from 'react-redux';
+import { useToast } from '@chakra-ui/react';
+import { LoginUser, addUser } from '../redux/action';
+import { RESET_USER } from '../redux/actiontype';
 
-const obj={
-    username:"",
-    email:"",
-      password:""
-  }
 
-function Signup() {
+function Signup({onClose, onOpen }) {
     const Navigate=useNavigate();
     const [form,setForm]=useState()
     const provider= new GoogleAuthProvider()
+    const dispatch = useDispatch()
+  const status = useSelector(state => state.user.status);
+  console.log(status)
+  const toast = useToast()
 
-    function HandleChange(e){
-        setForm({...form,[e.target.name]:e.target.value});
-       }
-    
-      async function HandleSubmit(e){
-    
-        console.log(obj)
-        e.preventDefault();
-        try {
-          let resp=await axios.post(`http://localhost:9911/user/login`,{...form});
-          console.log(resp)
-          // if(resp.data.operator==='admin'){
-          //   navigator('/home')
-          // }
-          // const obj={
-          //   isauth.token:resp.token,
-          //   isautho.isauth:true,
-          // }
-    
-          // setIsautho(obj)
-        } catch (error) {
-          console.log(error)
-        }
-          
-            console.log("Form Submitted");
-       }
-    
-       const signInWithGoogle = () => {
-        signInWithPopup(auth, provider).then((result) => {
-          // navigate("/home");
-          console.log(result)
-        });
+    const [user, setUser] = useState({
+      username: "",
+      email: "",
+      password: ""
+    });
+  
+    const handleGoogleLogin = async () => {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const { displayName, email, photoURL } = result.user;
+      let obj = {
+        email,
+        username: displayName,
+        profilePic: photoURL,
+        gauth: true
       }
+      dispatch(LoginUser(obj));
+    };
+  
+    console.log(user)
+  
+    const HandleChange = (e) => {
+      e.preventDefault();
+      setUser({ ...user, [e.target.name]: e.target.value })
+    }
+  
+    const HandleSubmit = async (e) => {
+      e.preventDefault()
+      const { username, email, password } = user
+      if (username == "" || username.length < 3) {
+        return toast({
+          title: 'Enter Full Name',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+       
+      }
+  
+      if (!email.includes('@') || !email.includes('.com') || email.length<12) {
+        return toast({
+          title: 'Enter valid email',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+       
+      }
+    
+  
+      if (password === "" || password.length < 10) {
+        return toast({
+          title: 'Enter valid password',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+  
+        
+      }
+  
+      dispatch(addUser(user))
+  
+  
+    }
+  
+    useEffect(() => {
+      if(status=='201'){
+        toast({
+          title: 'Login successfull',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        })
+        // onClose()
+      }
+      else if (status == "200") {
+        toast({
+          title: 'Signup successfull',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        })
+        // onClose(); 
+        // onOpen();
+      }
+      else if (status == "409") {
+        toast({
+          title: 'Email Already Exist',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+      }
+      dispatch({ type: RESET_USER, payload: "" })
+    }, [status])
 
 
   return (
@@ -63,7 +129,7 @@ function Signup() {
           <label className="mr-1">Sign in with</label>
           <div>
           <FcGoogle
-             onClick={signInWithGoogle}
+             onClick={handleGoogleLogin}
          className="w-24 h-[35px] -ml-12 cursor-pointer"
       />
       
@@ -74,7 +140,7 @@ function Signup() {
         <p className="mx-4 mb-0 text-center font-semibold text-slate-500">Or</p>
       </div>
       <form onSubmit={HandleSubmit}>
-      <input className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded" type="text" placeholder="Email Address" name='username'/>
+      <input onChange={(e)=>HandleChange(e)} className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded" type="text" placeholder="Full name" name='username'/>
      
       <input   onChange={(e)=>HandleChange(e)} className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded mt-4" type="email" placeholder="Email Address" name='email' />
       <input   onChange={(e)=>HandleChange(e)} className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded mt-4" type="password" placeholder="Password" name='password' />

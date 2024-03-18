@@ -1,5 +1,6 @@
 import axios from "axios"
 import {
+  ADD_TASK,
   EDIT_USER,
   GET_USER,
   LOGIN_USER,
@@ -23,7 +24,7 @@ export const getUser = (id) => async (dispatch) => {
 export const addUser = (user) => async (dispatch) => {
 
   try {
-    const res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/user/addUser`, {
+    const res = await axios.post(`http://localhost:9911/user/addUser`, {
       ...user
     })
     console.log(res.status)
@@ -43,20 +44,24 @@ export const addUser = (user) => async (dispatch) => {
 
 // <------------ Login User ---------------------->
 export const LoginUser = (user) => async (dispatch) => {
+console.log(user)
 
   try {
-    const res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/user/login`, {
+    const res = await axios.post(`http://localhost:9911/user/login`, {
       ...user
     })
+    console.log(res.data)
+    console.log(res.data.token)
+
     setCookie(res.data.user._id)
     dispatch({
       type: LOGIN_USER,
-      payload: {currUser:res.data.user,statuscode:res.status}
+      payload: {currUser:res.data.user_present,statuscode:res.status,token:res.data.token}
     })
   } catch (err) {
     dispatch({
       type: RESET_USER,
-      payload:err.response.status
+      payload:err.status
     })
 
   }
@@ -116,4 +121,20 @@ export const getCookie = () => {
     }
   }
   return "";
+}
+
+export const Addtask = (task) => async (dispatch) => {
+  console.log(task)
+  try {
+    let resp= await axios.post(`http://localhost:9911/task/createTask/`, {
+      ...task
+    })
+    console.log(resp.data)
+    dispatch({
+      type: ADD_TASK,
+      payload: resp.data
+    })
+  } catch (err) {
+    console.log(err)
+  }
 }
